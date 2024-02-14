@@ -1,0 +1,67 @@
+  /* Global styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  /* Button styles */
+  button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #3e8e41; /* Darker green */
+  }
+  
+  /* Heading styles */
+  h3 {
+    margin: 20px 0;
+    font-size: 24px;
+    color: #333; /* Dark gray */
+  }
+  
+  /* Result div styles */
+  #result {
+    padding: 10px;
+    border: 1px solid #ccc; /* Light gray border */
+    font-size: 16px;
+    background-color: #fff; /* White background */
+  }
+  
+  /* Select dropdown styles */
+  select {
+    padding: 8px;
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  select option {
+    padding: 5px;
+  }
+  
+  /* Optional enhancements (customize as needed) */
+  body {
+    background-color: #f2f2f2; /* Light gray background */
+  }
+  
+  button:focus {
+    outline: none; /* Remove default outline on focus */
+  }
+  
+  #result code {
+    font-family: monospace; /* Use monospaced font for code snippet */
+    background-color: #fafafa; /* Light gray background for code block */
+    padding: 5px;
+  }
