@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Menu</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+<body>
+    <button class="btn btn-secondary" onclick="window.location.href = '/client/index.html'">
+        Main menu
+    </button>
+    <h1>Edit Menu</h1>
+    <div class="container mt-5">
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control" id="id" name="id" placeholder="ID">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="patchCareer();">Save</button>
+          <button class="btn btn-danger"  onclick="deleteCareer();">Delete</button>
+
+
+        </form>
+      </div>
+
+    <script>
+        // Función para obtener el valor de un parámetro de la URL
+        function getParamURL(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Obtén el valor del parámetro "parametro" de la URL
+        
+
+        function deleteCareer(){
+            if (confirm("¿Está seguro de eliminar la carrera?")){
+                const id = getParamURL('_id');
+                const API_URL = `http://localhost:3001/api/careers?_id=${id}`;
+                // Realiza una solicitud DELETE al servidor
+                fetch(API_URL, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (!response.ok) {
+                    throw new Error(`Error deleting career: ${response.status}`);
+                    }
+                    // La respuesta es exitosa, puedes manejarla según tus necesidades
+                    alert("Carrera eliminada correctamente")
+                    console.log('Career successfully deleted');
+                })
+                .catch(error => {
+                    // Manejar errores en la solicitud
+                    console.error('Error deleting career:', error.message);
+                });
+            }
+            
+        }
+
+        async function getCareerData(){
+    const id = getParamURL('_id');
+    const API = `http://localhost:3001/api/careers?_id=${id}`;
+    
+    try {
+        const response = await fetch(API);
+        const career = await response.json();
+
+        console.log('Objeto de carrera:', career); // Imprime el objeto completo en la consola
+
+        if (career.id_code) {
+            alert(career.id_code);
+        } else {
+            alert('id_code no encontrado en la respuesta');
+        }
+    } catch (error) {
+        console.error('Error al realizar la solicitud:', error);
+    }
+}
+
+    // async function getCareers(){
+    //   const API_URL = "http://localhost:3001/api/careers";   
+    //   fetch(API_URL)
+    //     .then(response => response.json())
+    //     .then(careers =>{
+    //       const dataList = document.getElementById('dataList');
+    //       dataList.innerHTML = "";
+    //       careers.forEach(career=>{
+    //         const row = dataList.insertRow();
+    //         const cell1 = row.insertCell(0);
+    //         const cell2 = row.insertCell(1);
+    //         const cell3 = row.insertCell(2);
+    //         const cell4 = row.insertCell(3);
+ 
+
+    //         // Llena las celdas con los datos de la carrera
+   
+    //         cell1.textContent = career.id_code;
+    //         cell2.textContent = career.name;
+    //         cell3.textContent = career.description;
+
+
+    //         let editButton = document.createElement("button");
+    //         editButton.textContent = "Edit";
+    //         editButton.addEventListener("click", function() {
+    //             // Redirigir a /client/edit.html?_id= con el ID de la persona
+    //             window.location.href = "/client/edit.html?_id=" + career._id;
+    //         });
+    //         cell4.appendChild(editButton);
+
+            
+        
+    //       })        
+    //     })
+    // }
+        function patchCareer(){
+            const idCode = document.getElementById("id").value;
+            const name = document.getElementById("name").value;
+            const description = document.getElementById("description").value;
+ 
+            const careerData = {
+                id_code: idCode,
+                name: name,
+                description: description
+            }
+            const id = getParamURL('_id');
+            const API_URL = `http://localhost:3001/api/careers?_id=${id}`;
+            fetch(API_URL,{
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(careerData),
+            })
+            .then(data => {
+                console.log('Datos actualizados con éxito:', data);
+            })
+            .catch(error => {
+                console.error('Error al actualizar datos:', error);
+            });
+
+        }
+
+        function PutCareer(){
+            const data = {
+                id_code: document.getElementById("id"),
+                name: document.getElementById("name"),
+                description: document.getElementById("description")
+            }
+            
+            const API_URL = `http://localhost:3001/api/careers`;
+            fetch(API_URL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                throw new Error(`Error de red: ${response.status}`);
+                }
+                alert("Edicion correcta");
+                return response.json();
+                
+            })
+            .then(data => {
+                console.log('Respuesta exitosa:', data);
+                alert("Edicion correcta");
+            })
+            .catch(error => {
+                console.error('Error en la solicitud PUT:', error);
+            });
+        }
+       
+    </script>
+
+</body>
+</html>

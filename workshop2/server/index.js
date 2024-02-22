@@ -41,18 +41,20 @@ app.post('/paises', async (req, res) => {
   console.log("Currency selected:", currency);
   try {
     const response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${currency}.json`);
-    const responseData = await response.json();
-    dolarValue = responseData[currency].usd;
-    eurValue = responseData[currency].eur;
+    const data = await response.json();
+    dolarValue = data[currency].usd;
+    eurValue = data[currency].eur;
     console.log("dolar: ", dolarValue, " euro: ", eurValue);
 
     res.send('Datos recibidos en el servidor.');
 
     resResultCurrency();
-    
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
   } catch (error) {
-    console.error("Error en la solicitud GET /paises:", error);
-    res.status(500).send('Error en el servidor.');
+    console.error('Error:', error);
   }
 });
 

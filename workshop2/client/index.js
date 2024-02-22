@@ -4,6 +4,7 @@ const error = () => console.log(this.responseText);
 
 // Esta funcion toma los datos del api de paises y los carga en combo box
 const ajaxRequestCountries = new XMLHttpRequest();
+ajaxRequestCountries.open("GET", "http://localhost:3001/paises");
 ajaxRequestCountries.addEventListener("load", (e) => {
   const countries = JSON.parse(e.target.responseText);
   let optionsHtml = "";
@@ -12,8 +13,6 @@ ajaxRequestCountries.addEventListener("load", (e) => {
   });
   document.getElementById("countries").innerHTML = optionsHtml;
 });
-ajaxRequestCountries.addEventListener("error", () => {});
-ajaxRequestCountries.open("GET", "http://localhost:3001/paises");
 ajaxRequestCountries.send();
 
 
@@ -23,7 +22,6 @@ async function sendCurrency() {
   // se obtiene el pais seleccionado
   const comboBox = document.getElementById("countries");
   const selection = comboBox.options[comboBox.selectedIndex].value;
-
   try {
       // Se solicita al servidor informacion deln pais seleccionado
       const response = await fetch("http://localhost:3001/paises", {
@@ -31,17 +29,12 @@ async function sendCurrency() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ selection: selection }),
       });
-
       // En caso de error
       if (!response.ok) {
           throw new Error(`HTTP error: ${response.status}`);
       }
-
-      
-      const responseData = await response.json(); // respuesta es en formato JSON.
-      console.log("Response data:", responseData);
-
-      
+      const data = await response.json(); // respuesta es en formato JSON.
+      console.log("Response data:", data);
   } catch (error) {
       console.error("Error sending currency:", error);
   }
@@ -54,12 +47,8 @@ async function getCurrencyValue() {
   try {
     // solicitud de datos utilizando fetch.
     const response = await fetch('http://localhost:3001/result');
-
-
-    if (response.ok) {
       // Se convierten los datos en json
       const data = await response.json();
-
       // se obtiene los valores de dólar y euro.
       const dolarValue = data.dolarValue;
       const eurValue = data.eurValue;
@@ -70,11 +59,11 @@ async function getCurrencyValue() {
           <p>Dólar: ${dolarValue}</p>
           <p>Euro: ${eurValue}</p>
       `;
-    } else {
-      console.error('Error al obtener datos. Código de estado:', response.status);
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
     }
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error:', error);
   }
 }
 
