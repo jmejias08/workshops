@@ -87,21 +87,18 @@ const careerPatch = (req, res) => {
         res.json({ error: "Career doesnt exist" })
       }
 
-      // update the teacher object (patch)
+      // update the career object (patch)
       career.name = req.body.name ? req.body.name : career.name;
       career.id_code = req.body.id_code ? req.body.id_code : career.id_code;
       career.description = req.body.description ? req.body.description : career.description;
 
-      // update the teacher object (put)
-      // teacher.title = req.body.title
-      // teacher.detail = req.body.detail
 
       career.save(function (err) {
         if (err) {
           res.status(422);
-          console.log('error while saving the teacher', err)
+          console.log('error while saving the career', err)
           res.json({
-            error: 'There was an error saving the teacher'
+            error: 'There was an error saving the career'
           });
         }
         res.status(200); // OK
@@ -110,12 +107,12 @@ const careerPatch = (req, res) => {
     });
   } else {
     res.status(404);
-    res.json({ error: "Teacher doesnt exist" })
+    res.json({ error: "Career doesnt exist" })
   }
 };
 
 /**
- * Deletes a teacher
+ * Deletes a career
  *
  * @param {*} req
  * @param {*} res
