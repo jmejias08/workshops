@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Menu</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+<body>
+    <button class="btn btn-secondary" onclick="window.location.href = '/client/menu.html'">
+        Main menu
+    </button>
+    <h1>Edit Menu</h1>
+    <div class="container mt-5">
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="id" name="id" placeholder="ID">
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="patchCareer();">Save</button>
+          <button class="btn btn-danger"  onclick="deleteCareer();">Delete</button>
+
+        </form>
+      </div>
+
+    <script>
+        // Función para obtener el valor de un parámetro de la URL
+        function getParamURL(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        
+        // funcion que elimina de acuerdo con el parametro id recibido en el URL
+        async function deleteCareer(){
+            if (confirm("¿Está seguro de eliminar la carrera?")){
+                const id = getParamURL('_id');
+                const API_URL = `http://localhost:3001/api/careers?_id=${id}`;
+                const TOKEN = localStorage.getItem('token');
+                // Realiza una solicitud DELETE al servidor
+                await fetch(API_URL, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${TOKEN}`,
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        alert(response.status)
+                        throw new Error(`Error deleting career: ${response.status}`);
+                    }
+                    // La respuesta es exitosa, puedes manejarla según tus necesidades
+                    alert("Carrera eliminada correctamente")
+                    console.log('Career successfully deleted');
+                    
+                })
+                .catch(error => {
+                    // Manejar errores en la solicitud
+                    
+                    console.error('Error deleting career:', error.message);
+                });
+                
+            }
+        }
+
+      
+        // funcion que utiliza el metodo patch con axios, para editar carreras
+        async function patchCareer(){
+            // se optienen los datos del formulario
+            const idCode = document.getElementById("id").value;
+            const name = document.getElementById("name").value;
+            const description = document.getElementById("description").value;
+            // se guardan los datos en un objeto
+            const careerData = {
+                id_code: idCode,
+                name: name,
+                description: description
+            }
+            const id = getParamURL('_id');
+            const API_URL = `http://localhost:3001/api/careers?_id=${id}`;
+            const TOKEN = localStorage.getItem('token');
+
+            await fetch(API_URL,{
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${TOKEN}`,
+                },
+                body: JSON.stringify(careerData),
+            })
+            .then(data => {
+                console.log('Career patched succesfully:', data);
+            })
+            .catch(error => {
+                console.error('Error patching career:', error.message);
+            });
+        }
+
+        
+    </script>
+
+</body>
+</html>
