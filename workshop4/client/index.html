@@ -1,98 +1,92 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        form#loginForm {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 300px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cliente GraphQL</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-        input[type=text], input[type=password] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 16px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        button[type=button] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease-in-out;
-        }
-
-        button[type=button]:hover {
-            background-color: #3e8e41;
-        }
-    
-    </style>
 </head>
 <body>
+  <h1>Cliente GraphQL</h1>
 
+  <div class="container mt-5">
+    <h2>CRUD </h2>
 
-    <form id="loginForm">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        
-        <button type="button" onclick="login()">Login</button>
-      </form>
+    <!-- Create Form -->
+    <form id="createForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="id_code">Career code:</label>
+          <input type="text" class="form-control" id="id_code" name="id_code" required>
+      </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" class="form-control" id="description" name="description" required>
+        </div>
+        <button type="button" class="btn btn-success" onclick="saveCareer();">Create</button>
+    </form>
 
-        <script>
-            async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;  
-            if (username && password) {
-                try {
-                    const response = await fetch('http://localhost:3001/api/session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    } )
-                    });
-                    const data = await response.json();
-                    if (response.ok) {
-                        //local storage
-                        localStorage.setItem("token", data.session.token);
-                        window.location.href = "/client/menu.html"
-                    } else {
-                    alert(data.error);
-                    }
-                } catch (error) {
-                    console.error('Error al iniciar sesión:', error);
-                    alert('Error al iniciar sesion.');
-                }
-            } else {
-                alert('Error al ingresar usuario y contraseña');
-            }
-        }
-      </script>
+    <hr>
 
+    <h2>Careers:</h2>
+    <!-- Read/Update/Delete Table -->
+    <table id="careers-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Código</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody id="careers-tbody">
+    </tbody>
+  </table>
+    <button type="button" class="btn btn-success" onclick="getCareers();">Load data</button>
+  </div>
+
+  <script src="https://unpkg.com/apollo-client@3.6.8/dist/umd/apollo-client.min.js"></script>
+
+  <script>
+      // Función para cargar las carreras desde el servidor y mostrarlas en la tabla
+      const client = new ApolloClient({
+      cache: new InMemoryCache(),
+      uri: 'http://localhost:3000/graphql', // Reemplaza por la URL de tu servidor GraphQL
+    });
+
+    const query = `
+    query {
+      getAllCareers {
+        id
+        name
+        id_code
+        description
+      }
+    }
+    `;
+
+    client.query({ query }).then((response) => {
+      const careers = response.data.getAllCareers;
+
+      const tbody = document.getElementById('careers-tbody');
+
+      careers.forEach((career) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${career.id}</td>
+          <td>${career.name}</td>
+          <td>${career.id_code}</td>
+          <td>${career.description}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    });
+
+  </script>
 </body>
 </html>

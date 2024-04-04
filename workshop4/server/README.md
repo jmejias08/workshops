@@ -15,3 +15,8 @@
 ## Test
 
 - To test this you can use [postman](https://www.postman.com/) or a simple curl request: `curl http://localhost:3000/hello`
+
+
+## Configure environment
+
+- Rename the .env.template to .env and set the right values
