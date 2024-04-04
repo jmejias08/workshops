@@ -9,6 +9,8 @@ const app = express();
 const schema = require('./schema.js');
 const CareerModel = require('./models/careerModel.js');
 
+
+
 // Resolvers para las operaciones GraphQL
 const root = {
     getCareer: async ({ id }) => {
@@ -30,6 +32,7 @@ const root = {
     },
 };
   
+
 // database connection
 const mongoose = require("mongoose");
 const db = mongoose.connect(process.env.DB_CONNECTION_STRING, {
@@ -40,13 +43,20 @@ const db = mongoose.connect(process.env.DB_CONNECTION_STRING, {
 
 // parser for the request body (required for the POST and PUT methods)
 const bodyParser = require("body-parser");
+// check for cors
 const cors = require("cors");
+app.use(cors({
+  domains: '*',
+  methods: "*"
+}));
 
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: root,
     graphiql: true, // Habilitar interfaz GraphiQL
 }));
+
+
 
 const port = 3000;
 app.listen(port, () => {

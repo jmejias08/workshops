@@ -34,58 +34,139 @@
 
     <h2>Careers:</h2>
     <!-- Read/Update/Delete Table -->
-    <table id="careers-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Código</th>
-        <th>Descripción</th>
-      </tr>
-    </thead>
-    <tbody id="careers-tbody">
-    </tbody>
+    <h2>Careers:</h2>
+    <!-- Read/Update/Delete Table -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody id="dataList">
+          <!-- Aqui se insertan datos -->
+        </tbody>
+    </table>
   </table>
     <button type="button" class="btn btn-success" onclick="getCareers();">Load data</button>
   </div>
 
-  <script src="https://unpkg.com/apollo-client@3.6.8/dist/umd/apollo-client.min.js"></script>
-
+  
   <script>
-      // Función para cargar las carreras desde el servidor y mostrarlas en la tabla
-      const client = new ApolloClient({
-      cache: new InMemoryCache(),
-      uri: 'http://localhost:3000/graphql', // Reemplaza por la URL de tu servidor GraphQL
-    });
 
+    async function getCareers(){
+        // Realizar la consulta GraphQL
     const query = `
-    query {
-      getAllCareers {
-        id
-        name
-        id_code
-        description
-      }
-    }
-    `;
-
-    client.query({ query }).then((response) => {
-      const careers = response.data.getAllCareers;
-
-      const tbody = document.getElementById('careers-tbody');
-
-      careers.forEach((career) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${career.id}</td>
-          <td>${career.name}</td>
-          <td>${career.id_code}</td>
-          <td>${career.description}</td>
+            query {
+                getAllCareers {
+                    id
+                    id_code
+                    name
+                    description
+                }
+            }
         `;
 
-        tbody.appendChild(row);
-      });
-    });
+        fetch('http://localhost:3000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            const dataList = document.getElementById('dataList');
+            dataList.innerHTML = "";
+            data.data.getAllCareers.forEach(career => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${career.id_code}</td>
+                    <td>${career.name}</td>
+                    <td>${career.description}</td>
+                `;
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Delete";
+                deleteButton.className = "btn btn-danger";
+                deleteButton.addEventListener("click", function(){
+                    deleteCareer(career.id);
+                });
+                row.appendChild(deleteButton);
+                let editButton = document.createElement("button");
+                  editButton.textContent = "Edit";
+                  editButton.className = "btn btn-info";
+                  editButton.addEventListener("click", function() {
+                      // Redirigir a /client/edit.html?_id= con el ID
+                      window.location.href = "./edit.html?id=" + career.id;
+                  });
+                row.appendChild(editButton);
+                dataList.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    
+    }
+    
+    function saveCareer() {
+        const name = document.getElementById('name').value;
+        const id_code = document.getElementById('id_code').value;
+        const description = document.getElementById('description').value;
+
+        const mutation = `
+            mutation {
+                addCareer(input: {
+                    name: "${name}",
+                    id_code: "${id_code}",
+                    description: "${description}"
+                }) {
+                    id
+                    name
+                    id_code
+                    description
+                }
+            }
+        `;
+
+        fetch('http://localhost:3000/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: mutation }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Limpiar los campos del formulario
+            document.getElementById('name').value = '';
+            document.getElementById('id_code').value = '';
+            document.getElementById('description').value = '';
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function deleteCareer(id) {
+            const mutation = `
+                mutation {
+                    deleteCareer(id: "${id}")
+                }
+            `;
+
+            fetch('http://localhost:3000/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: mutation }),
+            })
+            .then(response => response.json())
+            .then(data => {
+               getCareers();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+    window.onload = getCareers();        
 
   </script>
 </body>

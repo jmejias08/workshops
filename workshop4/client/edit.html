@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Menu</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+<body>
+    <button class="btn btn-secondary" onclick="window.location.href = './index.html'">
+        Main menu
+    </button>
+    <h1>Edit Menu</h1>
+    <div class="container mt-5">
+        <form>
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="id" name="id" placeholder="ID">
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="patchCarer()">Save</button>
+
+        </form>
+      </div>
+
+    <script>
+        // Función para obtener el valor de un parámetro de la URL
+        function getParamURL(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+
+        async function getDataCareer() {
+            const id = getParamURL('id');
+            const query = `
+                query {
+                    getCareer(id: "${id}") {
+                        id
+                        name
+                        id_code
+                        description
+                    }
+                }
+            `;
+            fetch('http://localhost:3000/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const career = data.data.getCareer;
+                document.getElementById('name').value = career.name;
+                document.getElementById('id').value = career.id;
+                document.getElementById('description').value = career.description;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function patchCarer(){
+            const id = getParamURL('id');
+            const newName = document.getElementById('name').value;
+            const newIdCode = document.getElementById('id').value;
+            const newDescription = document.getElementById('description').value;
+
+            const mutation = `
+                mutation {
+                    updateCareer(id: "${id}", input: {
+                        name: "${newName}"
+                        id_code: "${newIdCode}"
+                        description: "${newDescription}"
+                    }) {
+                        id
+                        name
+                        id_code
+                        description
+                    }
+                }
+            `;
+
+            fetch('http://localhost:3000/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: mutation }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Una vez que se haya actualizado la carrera, puedes mostrar algún mensaje de éxito o redirigir a otra página.
+                console.log('Career updated successfully:', data.data.updateCareer);
+            })
+            .catch(error => console.error('Error:', error));
+        
+        }
+
+      
+            
+
+        window.onload = getDataCareer();
+
+    </script>
+
+</body>
+</html>
